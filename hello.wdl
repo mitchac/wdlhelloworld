@@ -6,16 +6,17 @@ workflow hello {
     Array[String]+ outputPaths
   }
   call split { 
-  input: inputFastq = inputFastq,
-  outputPaths=outputPaths 
+  input: 
+    inputFastq = inputFastq,
+    outputPaths=outputPaths 
   }
 }
 
 task split {
   input { 
-  File inputFastq
-  Array[String]+ outputPaths
-  String dockerImage = "quay.io/biocontainers/fastqsplitter:1.1.0--py37h516909a_1"
+    File inputFastq
+    Array[String]+ outputPaths
+    String dockerImage = "quay.io/biocontainers/fastqsplitter:1.1.0--py37h516909a_1"
   }
   command <<<
     set -e
@@ -31,6 +32,6 @@ task split {
     Array[File] chunks = outputPaths
   }
   runtime {
-        docker: dockerImage
-    }
+    docker: dockerImage
+  }
 }
