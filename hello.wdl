@@ -59,7 +59,7 @@ task download_curl {
 
 task extract_archive {
   input { 
-    File zipped_file
+    File? zipped_file
     String dockerImage = "ubuntu"
   } 
   command {
