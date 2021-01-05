@@ -7,7 +7,7 @@ workflow hello {
     String download_filename
     #Array[String]+ outputPaths
   }
-  call download-curl { 
+  call download_curl { 
     input: 
       download_path_suffix = download_path_suffix,
       download_filename = download_filename
@@ -41,7 +41,7 @@ task download-ascp {
   }
 }
 
-task download-curl {
+task download_curl {
   input { 
     String download_path_suffix
     String download_filename
