@@ -2,16 +2,21 @@ version 1.0
 
 workflow hello {
   input {
+    String SRA_accession_num
     #File inputFastq
-    String download_path_suffix
-    String download_filename
+    #String download_path_suffix
+    #String download_filename
     #Array[String]+ outputPaths
   }
-  call download_curl { 
+  call get_reads_from_run { 
     input: 
-      download_path_suffix = download_path_suffix,
-      download_filename = download_filename
+      SRA_accession_num = SRA_accession_num
     }
+  #call download_curl { 
+  #  input: 
+  #    download_path_suffix = download_path_suffix,
+  #    download_filename = download_filename
+  #  }
   #call split { 
   #  input: 
   #    inputFastq = inputFastq,
@@ -78,6 +83,28 @@ task split {
   >>>
   output {
     Array[File] chunks = outputPaths
+  }
+  runtime {
+    docker: dockerImage
+  }
+}
+
+task get_reads_from_run {
+  input { 
+    String SRA_accession_num
+    String dockerImage = "tutum/curl"
+  }
+  command <<<
+    curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
+    | grep -Po 'vol.*?fastq.gz' \
+    > ftp.txt
+    curl -L -k 'http://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_bytes' \
+    | grep -Po '[0-9]*' | sed -n '1!p' \
+    > bytes.txt
+    paste -d, ftp.txt bytes.txt > out.txt
+  >>>
+  output {
+    File read_list = out.txt
   }
   runtime {
     docker: dockerImage
