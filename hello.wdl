@@ -98,13 +98,9 @@ task get_reads_from_run {
     curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
     | grep -Po 'vol.*?fastq.gz' \
     > ftp.txt
-    curl -L -k 'http://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_bytes' \
-    | grep -Po '[0-9]*' | sed -n '1!p' \
-    > bytes.txt
-    paste -d, ftp.txt bytes.txt > out.txt
   >>>
   output {
-    File read_list = "out.txt"
+    File read_list = "ftp.txt"
   }
   runtime {
     docker: dockerImage
