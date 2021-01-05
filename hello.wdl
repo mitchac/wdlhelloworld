@@ -56,7 +56,7 @@ task download_curl {
     docker: dockerImage
   }
   output {
-    File downloaded_file = glob("*.fastq.gz")
+    File downloaded_file = download_filename
   }
 }
 
