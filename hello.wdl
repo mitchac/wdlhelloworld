@@ -10,8 +10,7 @@ workflow hello {
     }
   call download_curl { 
     input: 
-      download_path_suffix = download_path_suffix,
-      download_filename = download_filename
+      download_path_suffixes = get_reads_from_run.download_path_suffixes,
     }
 }
 
