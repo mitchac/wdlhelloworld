@@ -2,14 +2,19 @@ version 1.0
 
 workflow hello {
   input {
-    File inputFastq
-    Array[String]+ outputPaths
+    #File inputFastq
+    String SRA_accession_num
+    #Array[String]+ outputPaths
   }
-  call split { 
-  input: 
-    inputFastq = inputFastq,
-    outputPaths=outputPaths 
-  }
+  call download { 
+    input: 
+      SRA_accession_num = SRA_accession_num
+    }
+  #call split { 
+  #  input: 
+  #    inputFastq = inputFastq,
+  #    outputPaths=outputPaths 
+  #  }
 }
 
 task download {
