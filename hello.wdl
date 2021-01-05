@@ -13,6 +13,10 @@ workflow hello {
       input: 
         download_path_suffix = download_path_suffix
     }
+    call test { 
+      input: 
+        file = download_curl.zipped_read
+    }
     #call extract_archive { 
     #  input: 
     #    zipped_file = download_curl.zipped_read
@@ -55,6 +59,22 @@ task download_curl {
   }
   output {
     File zipped_read = basename(filename, ".gz")
+  }
+}
+
+task test {
+  input { 
+    File? file
+    String dockerImage = "ubuntu"
+  } 
+  command {
+    cat ${file} >> out.txt
+  }
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    File outfile = "out.txt"
   }
 }
 
