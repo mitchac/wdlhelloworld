@@ -37,18 +37,19 @@ task get_reads_from_run {
 task download_curl {
   input { 
     String download_path_suffix
+    String filename = basename(download_path_suffix)
     String dockerImage = "tutum/curl"
   }
   command <<<
     curl \
     -L \
-    ftp://ftp.sra.ebi.ac.uk/~{download_path_suffix} -o ~{basename(download_path_suffix)}
+    ftp://ftp.sra.ebi.ac.uk/~{download_path_suffix} -o ~{filename}
     >>>
   runtime {
     docker: dockerImage
   }
   output {
-    File zipped_read = glob("*.fastq.gz")
+    File zipped_read = filename
   }
 }
 
