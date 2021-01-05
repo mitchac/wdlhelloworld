@@ -13,10 +13,10 @@ workflow hello {
       input: 
         download_path_suffix = download_path_suffix
     }
-    call extract_archive { 
-      input: 
-        zipped_file = download_curl.zipped_read
-    }
+    #call extract_archive { 
+    #  input: 
+    #    zipped_file = download_curl.zipped_read
+    #}
   }  
 }
 
