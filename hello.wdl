@@ -13,11 +13,11 @@ workflow hello {
 }
 
 task download {
-
-	String SRA_accession_num
-  String dockerImage = "mitchac/asperacli"
-
-	command <<<
+  input { 
+    String SRA_accession_num
+    String dockerImage = "mitchac/asperacli"
+  }
+  command <<<
     ascp \
     -QT \ 
     -l 300m \ 
@@ -25,15 +25,13 @@ task download {
     -i /root/.aspera/cli/etc/asperaweb_id_dsa.openssh \  
     era-fasp@fasp.sra.ebi.ac.uk:${SRA_accession_num} \ 
     ${SRA_accession_num}
-	>>>
-
-	runtime {
-		docker: dockerImage
-	}
-
-	output {
-		Array[File] fastq_file = glob("*.fastq.gz")
-	}
+    >>>
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    Array[File] fastq_file = glob("*.fastq.gz")
+  }
 }
 
 task split {
