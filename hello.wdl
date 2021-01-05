@@ -11,7 +11,7 @@ workflow hello {
   scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
     call download_curl { 
       input: 
-        download_path_suffixes = download_path_suffix
+        download_path_suffix = download_path_suffix
       }
   }  
 }
