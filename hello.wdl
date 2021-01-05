@@ -50,7 +50,7 @@ task download_curl {
   command <<<
     curl \
     -L \
-    ftp://ftp.sra.ebi.ac.uk/${download_path_suffix} -o ${download_filename}
+    ftp://ftp.sra.ebi.ac.uk/~{download_path_suffix} -o ~{download_filename}
     >>>
   runtime {
     docker: dockerImage
