@@ -60,8 +60,9 @@ task download_curl {
 task extract_archive {
   input { 
     File zipped_file
-    String dockerImage = "ubuntu"
-  }
+    #String dockerImage = "ubuntu"
+    String dockerImage = "quay.io/broadinstitute/viral-baseimage"
+  } 
   command <<<
     gunzip -f ~{zipped_file}
   >>>
