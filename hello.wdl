@@ -19,7 +19,7 @@ workflow hello {
   #  }
 }
 
-task download-ascp {
+task download_ascp {
   input { 
     String SRA_accession_num
     String dockerImage = "mitchac/asperacli"
