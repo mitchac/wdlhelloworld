@@ -3,25 +3,52 @@ version 1.0
 workflow hello {
   input {
     String SRA_accession_num
-    #File inputFastq
-    #String download_path_suffix
-    #String download_filename
-    #Array[String]+ outputPaths
   }
   call get_reads_from_run { 
     input: 
       SRA_accession_num = SRA_accession_num
     }
-  #call download_curl { 
-  #  input: 
-  #    download_path_suffix = download_path_suffix,
-  #    download_filename = download_filename
-  #  }
-  #call split { 
-  #  input: 
-  #    inputFastq = inputFastq,
-  #    outputPaths=outputPaths 
-  #  }
+  call download_curl { 
+    input: 
+      download_path_suffix = download_path_suffix,
+      download_filename = download_filename
+    }
+}
+
+task get_reads_from_run {
+  input { 
+    String SRA_accession_num
+    String dockerImage = "tutum/curl"
+  }
+  command <<<
+    curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
+    | grep -Po 'vol.*?fastq.gz' \
+    > ftp.txt
+  >>>
+  output {
+    Array[String] download_path_suffixes = read_lines("ftp.txt")
+  }
+  runtime {
+    docker: dockerImage
+  }
+}
+
+task download_curl {
+  input { 
+    Array[String] download_path_suffixes
+    String dockerImage = "tutum/curl"
+  }
+  command <<<
+    curl \
+    -L \
+    ftp://ftp.sra.ebi.ac.uk/~{download_path_suffixes} -o ~{basename(download_path_suffixes)}
+    >>>
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    Array[File] zipped_reads = glob("*.fastq.gz")
+  }
 }
 
 task download_ascp {
@@ -43,25 +70,6 @@ task download_ascp {
   }
   output {
     Array[File] fastq_file = glob("*.fastq.gz")
-  }
-}
-
-task download_curl {
-  input { 
-    String download_path_suffix
-    String download_filename
-    String dockerImage = "tutum/curl"
-  }
-  command <<<
-    curl \
-    -L \
-    ftp://ftp.sra.ebi.ac.uk/~{download_path_suffix} -o ~{download_filename}
-    >>>
-  runtime {
-    docker: dockerImage
-  }
-  output {
-    File downloaded_file = download_filename
   }
 }
 
@@ -89,20 +97,4 @@ task split {
   }
 }
 
-task get_reads_from_run {
-  input { 
-    String SRA_accession_num
-    String dockerImage = "tutum/curl"
-  }
-  command <<<
-    curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
-    | grep -Po 'vol.*?fastq.gz' \
-    > ftp.txt
-  >>>
-  output {
-    File read_list = "ftp.txt"
-  }
-  runtime {
-    docker: dockerImage
-  }
-}
+
