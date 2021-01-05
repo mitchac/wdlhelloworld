@@ -13,10 +13,10 @@ workflow hello {
       input: 
         download_path_suffix = download_path_suffix
     }
-    call extract_archive { 
-      input: 
-        zipped_file = download_curl.zipped_read
-    }
+    #call extract_archive { 
+    #  input: 
+    #    zipped_file = download_curl.zipped_read
+    #}
   }  
 }
 
@@ -48,6 +48,7 @@ task download_curl {
     curl \
     -L \
     ftp://ftp.sra.ebi.ac.uk/~{download_path_suffix} -o ~{filename}
+    gunzip -f ~{filename}
     >>>
   runtime {
     docker: dockerImage
