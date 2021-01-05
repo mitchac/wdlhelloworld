@@ -8,10 +8,12 @@ workflow hello {
     input: 
       SRA_accession_num = SRA_accession_num
     }
-  call download_curl { 
-    input: 
-      download_path_suffixes = get_reads_from_run.download_path_suffixes,
-    }
+  scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
+    call download_curl { 
+      input: 
+        download_path_suffixes = download_path_suffix
+      }
+  }  
 }
 
 task get_reads_from_run {
