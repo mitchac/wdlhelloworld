@@ -73,22 +73,6 @@ task extract_archive {
   }
 }
 
-process extract_archive {
-
-container 'ubuntu:latest'
-
-input:
-file(archive)
-
-output:
-file "*"
-
-script:
-"""
-gunzip -f ${archive}
-"""
-}
-
 task download_ascp {
   input { 
     String SRA_accession_num
