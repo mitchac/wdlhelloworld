@@ -3,7 +3,8 @@ version 1.0
 workflow hello {
   input {
     #File inputFastq
-    String SRA_accession_num
+    String download_path_suffix
+    String download_filename
     #Array[String]+ outputPaths
   }
   call download-curl { 
