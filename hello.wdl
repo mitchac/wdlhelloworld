@@ -54,7 +54,7 @@ task download_curl {
     docker: dockerImage
   }
   output {
-    File zipped_read = filename
+    File zipped_read = basename(filename, ".gz")
   }
 }
 
