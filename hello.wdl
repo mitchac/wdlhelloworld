@@ -104,7 +104,7 @@ task get_reads_from_run {
     paste -d, ftp.txt bytes.txt > out.txt
   >>>
   output {
-    File read_list = out.txt
+    File read_list = "out.txt"
   }
   runtime {
     docker: dockerImage
