@@ -7,12 +7,16 @@ workflow hello {
   call get_reads_from_run { 
     input: 
       SRA_accession_num = SRA_accession_num
-    }
+  }
   scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
     call download_curl { 
       input: 
         download_path_suffix = download_path_suffix
-      }
+    }
+    call extract_archive { 
+      input: 
+        zipped_file = download_curl.zipped_read
+    }
   }  
 }
 
@@ -51,6 +55,38 @@ task download_curl {
   output {
     File zipped_read = filename
   }
+}
+
+task extract_archive {
+  input { 
+    File zipped_file
+    String dockerImage = "ubuntu"
+  }
+  command <<<
+    gunzip -f ~{zipped_file}
+  >>>
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    File extracted_file = basename(zipped_file, ".gz")
+  }
+}
+
+process extract_archive {
+
+container 'ubuntu:latest'
+
+input:
+file(archive)
+
+output:
+file "*"
+
+script:
+"""
+gunzip -f ${archive}
+"""
 }
 
 task download_ascp {
