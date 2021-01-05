@@ -6,9 +6,10 @@ workflow hello {
     String SRA_accession_num
     #Array[String]+ outputPaths
   }
-  call download { 
+  call download-curl { 
     input: 
-      SRA_accession_num = SRA_accession_num
+      download_path_suffix = download_path_suffix,
+      download_filename = download_filename
     }
   #call split { 
   #  input: 
@@ -17,7 +18,7 @@ workflow hello {
   #  }
 }
 
-task download {
+task download-ascp {
   input { 
     String SRA_accession_num
     String dockerImage = "mitchac/asperacli"
@@ -36,6 +37,25 @@ task download {
   }
   output {
     Array[File] fastq_file = glob("*.fastq.gz")
+  }
+}
+
+task download-curl {
+  input { 
+    String download_path_suffix
+    String download_filename
+    String dockerImage = "tutum/curl"
+  }
+  command <<<
+    curl \
+    -L \
+    ftp://ftp.sra.ebi.ac.uk/${download_path_suffix} -o ${download_filename}
+    >>>
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    File downloaded_file = glob("*.fastq.gz")
   }
 }
 
