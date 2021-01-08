@@ -15,12 +15,8 @@ workflow hello {
     }
     call test { 
       input: 
-        file = download_curl.zipped_read
+        file = download_curl.extracted_read
     }
-    #call extract_archive { 
-    #  input: 
-    #    zipped_file = download_curl.zipped_read
-    #}
   }  
 }
 
@@ -58,7 +54,31 @@ task download_curl {
     docker: dockerImage
   }
   output {
-    File zipped_read = basename(filename, ".gz")
+    File extracted_read = basename(filename, ".gz")
+  }
+}
+
+task download_ascp {
+  input { 
+    String download_path_suffix
+    String filename = basename(download_path_suffix)
+    String dockerImage = "mitchac/asperacli"
+  }
+  command <<<
+    ascp \
+    -QT \ 
+    -l 300m \ 
+    -P33001 \
+    -i /root/.aspera/cli/etc/asperaweb_id_dsa.openssh \  
+    era-fasp@fasp.sra.ebi.ac.uk:~{download_path_suffix} \ 
+    ~{filename}
+    gunzip -f ~{filename}
+    >>>
+  runtime {
+    docker: dockerImage
+  }
+  output {
+    File extracted_read = basename(filename, ".gz")
   }
 }
 
@@ -94,27 +114,7 @@ task extract_archive {
   }
 }
 
-task download_ascp {
-  input { 
-    String SRA_accession_num
-    String dockerImage = "mitchac/asperacli"
-  }
-  command <<<
-    ascp \
-    -QT \ 
-    -l 300m \ 
-    -P33001 \
-    -i /root/.aspera/cli/etc/asperaweb_id_dsa.openssh \  
-    era-fasp@fasp.sra.ebi.ac.uk:${SRA_accession_num} \ 
-    ${SRA_accession_num}
-    >>>
-  runtime {
-    docker: dockerImage
-  }
-  output {
-    Array[File] fastq_file = glob("*.fastq.gz")
-  }
-}
+
 
 task split {
   input { 
