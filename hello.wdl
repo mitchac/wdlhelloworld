@@ -65,7 +65,7 @@ task download_ascp {
     String dockerImage = "mitchac/asperacli"
   }
   command <<<
-    ascp-QT -l 300m -P33001 -i /root/.aspera/cli/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:~{download_path_suffix} ~{filename}
+    ascp -QT -l 300m -P33001 -i /root/.aspera/cli/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:~{download_path_suffix} ~{filename}
     gunzip -f ~{filename}
     >>>
   runtime {
