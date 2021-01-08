@@ -9,13 +9,13 @@ workflow hello {
       SRA_accession_num = SRA_accession_num
   }
   scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
-    call download_curl { 
+    call download_ascp { 
       input: 
         download_path_suffix = download_path_suffix
     }
     call test { 
       input: 
-        file = download_curl.extracted_read
+        file = download_ascp.extracted_read
     }
   }  
 }
