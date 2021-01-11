@@ -2,22 +2,24 @@ version 1.0
 
 workflow hello {
   input {
-    String SRA_accession_num
+    Array[String] SRA_accession_nums
   }
-  call get_reads_from_run { 
-    input: 
-      SRA_accession_num = SRA_accession_num
+  scatter(SRA_accession_num in SRA_accession_nums) {
+    call get_reads_from_run { 
+      input: 
+        SRA_accession_num = SRA_accession_num
+    }
+    scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
+      call download_ascp { 
+        input: 
+          download_path_suffix = download_path_suffix
+      }
+      call test { 
+        input: 
+          file = download_ascp.extracted_read
+      }
+    }
   }
-  scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
-    call download_ascp { 
-      input: 
-        download_path_suffix = download_path_suffix
-    }
-    call test { 
-      input: 
-        file = download_ascp.extracted_read
-    }
-  }  
 }
 
 task get_reads_from_run {
