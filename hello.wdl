@@ -2,9 +2,13 @@ version 1.0
 
 workflow hello {
   input {
-    Array[String] SRA_accession_nums
+    File SRA_accession_list
   }
-  scatter(SRA_accession_num in SRA_accession_nums) {
+  call get_run_from_runlist { 
+    input: 
+      runlist = SRA_accession_list
+    }
+  scatter(SRA_accession_num in get_run_from_runlist.runarray) {
     call get_reads_from_run { 
       input: 
         SRA_accession_num = SRA_accession_num
@@ -19,6 +23,22 @@ workflow hello {
           file = download_ascp.extracted_read
       }
     }
+  }
+}
+
+task get_run_from_runlist {
+  input { 
+    File runlist
+    String dockerImage = "ubuntu"
+  }
+  command <<<
+  echo 'hello'
+  >>>
+  output {
+    Array[String] runarray = read_lines(runlist)
+  }
+  runtime {
+    docker: dockerImage
   }
 }
 
