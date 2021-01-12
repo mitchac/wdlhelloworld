@@ -3,15 +3,18 @@ version 1.0
 workflow hello {
   input {
     File SRA_accession_list
+    String Output_base_dir
   }
   call get_run_from_runlist { 
     input: 
       runlist = SRA_accession_list
     }
   scatter(SRA_accession_num in get_run_from_runlist.runarray) {
+    String Output_path = Output_base_dir + "/" + SRA_accession_num
     call get_reads_from_run { 
       input: 
         SRA_accession_num = SRA_accession_num
+        Output_path = Output_path
     }
     scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
       call download_ascp { 
@@ -45,12 +48,15 @@ task get_run_from_runlist {
 task get_reads_from_run {
   input { 
     String SRA_accession_num
+    String Output_path
     String dockerImage = "tutum/curl"
   }
   command <<<
     curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
     | grep -Po 'vol.*?fastq.gz' \
     > ftp.txt
+    mkdir -p "$(dirname ~{Output_path})"
+    cp ftp.txt ~{Output_path}
   >>>
   output {
     Array[String] download_path_suffixes = read_lines("ftp.txt")
