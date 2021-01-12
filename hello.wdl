@@ -13,7 +13,7 @@ workflow hello {
     String Output_path = Output_base_dir + "/" + SRA_accession_num
     call get_reads_from_run { 
       input: 
-        SRA_accession_num = SRA_accession_num
+        SRA_accession_num = SRA_accession_num,
         Output_path = Output_path
     }
     scatter(download_path_suffix in get_reads_from_run.download_path_suffixes) {
