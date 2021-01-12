@@ -28,7 +28,7 @@ workflow hello {
     }
   }
   output {
-    Array[File] Extracted_reads = select_all(download_ascp.extracted_read)
+    Array[Array[File]] Extracted_reads = select_all(download_ascp.extracted_read)
   }
 }
 
