@@ -27,6 +27,9 @@ workflow hello {
       }
     }
   }
+  output {
+    Array[File] Extracted_reads = select_all(download_ascp.extracted_read)
+  }
 }
 
 task get_run_from_runlist {
