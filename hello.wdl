@@ -55,7 +55,7 @@ task get_reads_from_run {
     curl -k 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=~{SRA_accession_num}&result=read_run&fields=fastq_ftp' \
     | grep -Po 'vol.*?fastq.gz' \
     > ftp.txt
-    mkdir -p "$(dirname ~{Output_path})"
+    mkdir -p ~{Output_path}
     cp ftp.txt ~{Output_path}
   >>>
   output {
