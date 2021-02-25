@@ -19,10 +19,10 @@ workflow hello {
           download_path_suffix = download_path_suffix
       }
     }
-      call singlem {
-        input:
-          collections_of_sequences = download_ascp.collection_of_sequences,
-          srr_accession = SRA_accession_num
+    call singlem {
+      input:
+        collections_of_sequences = download_ascp.collection_of_sequences,
+        srr_accession = SRA_accession_num
     }
   }
   output {
@@ -101,37 +101,25 @@ task download_ascp {
   }
 }
 
-task singlem_single {
-  input { 
-    File collection_of_sequences
-    String srr_accession
-    String dockerImage = "wwood/singlem:v0.13.2"
-  }
-  command <<<
-    singlem pipe --forward ~{collection_of_sequences} --otu_table ~{srr_accession}.singlem.csv --threads 28
-    >>>
-  runtime {
-    docker: dockerImage
-  }
-  output {
-    File singlem_otu_table = "~{srr_accession}.singlem.csv"
-  }
-}
-
 task singlem {
   input { 
     Array[File] collections_of_sequences
     String srr_accession
-    String dockerImage = "wwood/singlem:v0.13.2"
+    String dockerImage = "wwood/singlem:dev20210225"
   }
   command <<<
-    singlem pipe --forward ~{collections_of_sequences[0]} --reverse ~{collections_of_sequences[1]} --otu_table ~{srr_accession}.singlem.csv --threads 28 
+    /singlem/bin/singlem pipe --forward ~{collections_of_sequences[0]} --reverse ~{collections_of_sequences[1]} \
+      --archive_otu_table ~{srr_accession}.singlem.json --threads 8  --diamond-package-assignment --assignment-method diamond \
+      --singlem-packages `ls -d /pkgs/*spkg` \
+     --working-directory-tmpdir
     >>>
   runtime {
     docker: dockerImage
+    memory: "18 GiB"
+    cpu: 8
   }
   output {
-    File singlem_otu_table = "~{srr_accession}.singlem.csv"
+    File singlem_otu_table = "~{srr_accession}.singlem.json"
   }
 }
 
